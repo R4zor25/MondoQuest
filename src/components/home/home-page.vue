@@ -1,105 +1,106 @@
 <template>
-<Navbar />
-<Sidebar/>
-
-<header>
-  <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-      <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-      <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-      <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-    </div>
-    <div class="carousel-inner">
-      <div class="carousel-item active" style="background-image: url('https://picsum.photos/1920/1080')">
-        <div class="carousel-caption">
-          <h5>First slide label</h5>
-          <p>Some representative placeholder content for the first slide.</p>
-        </div>
-      </div>
-      <div class="carousel-item" style="background-image: url('https://picsum.photos/1920/1080')">
-        <div class="carousel-caption">
-          <h5>Second slide label</h5>
-          <p>Some representative placeholder content for the second slide.</p>
-        </div>
-      </div>
-      <div class="carousel-item" style="background-image: url('https://picsum.photos/1920/1080')">
-        <div class="carousel-caption">
-          <h5>Third slide label</h5>
-          <p>Some representative placeholder content for the third slide.</p>
-        </div>
-      </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-  </div>
-</header>
-
-<!-- Page Content -->
-<section class="py-5">
-  <div class="container">
-    <h1 class="fw-light">Half Page Image Slider</h1>
-    <p class="lead">The background images for the slider are set directly in the HTML using inline CSS. The images
-      in this snippet are from <a href="https://unsplash.com">Unsplash</a>!</p>
-  </div>
-</section>
+  <div class="frame">
+    <Navbar class="navbar" @toggle-sidebar="toggleSidebar" />
+    <Sidebar :isSidebarVisible="isSidebarVisible" @toggle-sidebar="toggleSidebar" />
+  <carousel class="carousel"  :items-to-show="imageCount" :wrapAround="true" :transition="500" :autoplay= 2000>
+    <slide v-for="slide in this.imageList" :key="slide">
+      <img class="img-fluid img-thumbnail" :src="slide" alt="">
+    </slide>
+    <template #addons>
+      <navigation />
+      <pagination />
+    </template>
+  </carousel>
+  <h2>Általános információk</h2>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Tudnivaló 1</li>
+    <li class="list-group-item">Tudnivaló 2</li>
+    <li class="list-group-item">Tudnivaló 3</li>
+  </ul>
+</div>
 </template>
 
 <script>
 import Navbar from "../component/navbar-component.vue";
 import Sidebar from "../component/new-sidebar-component.vue";
+import 'vue3-carousel/dist/carousel.css'
+import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 
 export default {
   components: {
-    Navbar, 
+    Carousel,
+    Slide,
+    Pagination,
+    Navigation,
+    Navbar,
     Sidebar
   },
   data() {
     return {
-      isSidebarVisible: true
+      isSidebarVisible: true,
+      imageList: [
+        "https://picsum.photos/400/300",
+        "https://picsum.photos/400/301",
+        "https://picsum.photos/400/302",
+        "https://picsum.photos/400/303",
+        "https://picsum.photos/400/304",
+        "https://picsum.photos/400/305",
+        "https://picsum.photos/400/306",
+        "https://picsum.photos/400/307",
+        "https://picsum.photos/400/308",
+      ],
+      imageCount: 3,
     };
   },
   methods: {
     toggleSidebar() {
       this.isSidebarVisible = !this.isSidebarVisible;
     },
+    isMobile() {
+    if( screen.width <= 760 ) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+   },
+  },
+
+  mounted() {
+    if(this.isMobile()) this.imageCount = 1;
   },
 };
 </script>
 
 <style scoped>
-body, html {
-  margin: 0;
-  padding: 0;
+.frame {
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
-  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  background-color: #333;
 }
 
-.main-content {
-  display: flex;
-  justify-content: start; /* Center horizontally */
-  align-items: start; /* Center vertically */
-  height: 100vh;
-  position: relative;
-  z-index: 1; /* Below Sidebar and Navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #343a40;
+  overflow-x: hidden;
+  transition: transform 0.3s ease;
+  z-index: 1000; 
 }
 
-.container {
-  text-align: center;
+.carousel{
+  width: 90%;
+  margin-top: 30px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.carousel-item {
-  height: 65vh;
-  min-height: 350px;
-  background: no-repeat center center scroll;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
+h1, h2, h3, h4, h5, h6, li {
+  color: #ccc;
 }
 </style>
