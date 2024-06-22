@@ -1,9 +1,9 @@
 <template>
   <div class="frame">
-  <Navbar @toggle-sidebar="toggleSidebar" />
-  <Sidebar :isSidebarVisible="isSidebarVisible" @toggle-sidebar="toggleSidebar" />
+    <Navbar class="navbar" @toggle-sidebar="toggleSidebar" />
+    <Sidebar :isSidebarVisible="isSidebarVisible" @toggle-sidebar="toggleSidebar" />
   <div class="container">
-    <Transition  name="slide-fade">
+    <Transition name="slide-fade">
       <div class="question-card" v-show="!loading">
         <h5>Jelenlegi pontszámod: {{ this.userPoint }}</h5>
         <select class="form-select" @change="fetchQuestionById" id="dropdown1" v-model="selectedQuestionId">
@@ -12,7 +12,7 @@
           </option>
         </select>
         <img v-if="question.questionType == 'IMAGE'" :src="'data:image/'+ imageType+';base64,'+ question.file" alt="Question Image" class="question-image" @click="toggleFullscreen"/>
-        <audio v-if="question.questionType == 'AUDIO'" :src="'data:audio/way;base64,'+ question.file" controls></audio>
+        <audio v-if="question.questionType == 'AUDIO'" :src="'data:audio/wav;base64,'+ question.file" controls></audio>
         <h2>{{ question.title }}</h2>
         <h4>{{ question.description }}</h4>
         <div class="answer-row" v-for="(row, rowIndex) in chunkedAnswers" :key="rowIndex">
@@ -32,21 +32,28 @@
             </div>
           </div>
         </div>
-        <button class="submit-button" @click="submitAnswer" :disabled="result !== null">Ellenőrzés</button>
-        <button class="submit-button" @click="fetchQuestion">Következő</button>
-        <div class="mb-3"></div>
-        <div v-if="result !== null" class="result">
-          {{ result.isCorrect ? 'Ügyes vagy faszos!' : 'Nem vagy ügyes faszos!' }}
-        </div>
+        <div class="submit-button-section">
+        <Transition name="slide-fade">
+        <button class="check-button" @click="submitAnswer" v-if="result === null" key="check">Ellenőrzés</button>
+        </Transition>
+        <Transition  name="slide-fade">
+        <button class="next-button" @click="fetchQuestion" v-if="result !== null" key="next">Következő</button>
+        </Transition>
+      </div>
+      <Transition name="slide-fade">
         <div v-if="result !== null" class="rating">
+          <h5 class="average-rating">Átlagos értékelés:{{ (Math.round(question.averageRating * 100) / 100).toFixed(2) }}</h5>
           <span v-for="star in 5" :key="star" class="star" :class="{ 'active': star <= rating }" @click="rateQuestion(star)">
             ★
           </span>
-          <h5>{{ (Math.round(question.averageRating * 100) / 100).toFixed(2) }}</h5>
         </div>
+      </Transition>
+      <Transition name="slide-fade">
         <div v-if="ratingSent" class="rating-sent">
-          Köszönjük a visszajelzést!
+          <h2>Köszönjük a visszajelzést!</h2>
         </div>
+      </Transition>
+      
         <div v-if="isFullscreen" class="fullscreen-overlay" @click="toggleFullscreen"></div>
           <div v-if="isFullscreen" class="fullscreen-image-container">
             <transition name="fullscreen-image-transition">
@@ -110,6 +117,7 @@ export default {
     this.result = null;
     this.resultSent = false;
     this.ratingSent = false;
+    this.rating = 0;
     setTimeout(() => {
       axios.get(`http://192.168.0.39:8081/api/question/infinite/random/${this.userId}`)
         .then(response => {
@@ -211,17 +219,28 @@ export default {
 
 <style scoped>
 h2, h3, h4, h5 {
-  color: #ccc;
+  color: #ddd;
 }
 
 .frame {
-  display: flex;
-  flex-direction: row;
-  align-items: start;
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
+  width: 100%;
   justify-content: center;
-  padding-right: 30px;
+  align-items: center;
   background-color: #333;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #343a40;
+  overflow-x: hidden;
+  transition: transform 0.3s ease;
+  z-index: 1000; 
 }
 
 .container {
@@ -241,20 +260,53 @@ h2, h3, h4, h5 {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 16px;
   opacity: 1;
-  transition: opacity 0.3s ease-in-out;
+  transition: all 0.5s ease;
 }
 
-.question-card.slide-fade-enter-active, .question-card.slide-fade-leave-active {
-  transition: opacity 0.3s ease-in-out;
+.question-card.slide-fade-enter-active, 
+.question-card.slide-fade-leave-active,
+.check-button.slide-fade-enter-active,
+.check-button.slide-fade-leave-active,
+.next-button.slide-fade-enter-active,
+.next-button.slide-fade-leave-active,
+.rating.slide-fade-enter-active,
+.rating.slide-fade-leave-active,
+.rating-sent.slide-fade-enter-active,
+.rating-sent.slide-fade-leave-active{
+ /* transition: opacity 0.5s ease-in-out;*/
+ transition: all 0.5s ease;
 }
 
-.question-card.slide-fade-enter-from, .question-card.slide-fade-leave-to {
+.question-card.slide-fade-enter-from,
+ .question-card.slide-fade-leave-to,
+ .rating.slide-fade-enter-from,
+ .rating.slide-fade-leave-to,
+ .rating-sent.slide-fade-enter-from,
+ .rating-sent.slide-fade-leave-to
+ {
+  transform: translateY(50px);
+  opacity: 0;
+}
+
+.check-button.slide-fade-enter-from {
+  opacity: 0;
+}
+.check-button.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+.next-button.slide-fade-enter-from {
+  opacity: 0;
+  transform: translateX(100%);
+}
+.next-button.slide-fade-leave-to {
   opacity: 0;
 }
 
 .question-card.slide-fade-enter-active .answer-card,
 .question-card.slide-fade-leave-active .answer-card {
-  transition: opacity 0.3s ease-in-out;
+  transition: all 0.5s ease;
 }
 
 .question-card.slide-fade-enter-from .answer-card,
@@ -264,7 +316,7 @@ h2, h3, h4, h5 {
 
 .question-card.slide-fade-enter-active .question-image,
 .question-card.slide-fade-leave-active .question-image {
-  transition: opacity 0.3s ease-in-out;
+  transition: all 0.5s ease;
 }
 
 .question-card.slide-fade-enter-from .question-image,
@@ -278,6 +330,7 @@ h2, h3, h4, h5 {
   margin-bottom: 20px;
   border-radius: 8px;
   margin-bottom: 16px;
+  cursor: pointer;
 }
 
 @media (max-width: 800px) { .question-image { 
@@ -306,15 +359,15 @@ h2, h3, h4, h5 {
   color: #ccc;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.5s;
 }
 
 .answer-card:hover {
-  background-color: #f1f1f1;
+  background-color: #777;
 }
 
 .answer-card.selected {
-  background-color: #d1ecf1;
+  background-color: #999;
 }
 
 .answer-card.correct {
@@ -327,15 +380,43 @@ h2, h3, h4, h5 {
   color: white;
 }
 
-.submit-button {
+.submit-button-section{
+  position: relative;
+  margin-bottom: 75px;
+}
+
+.check-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   margin-top: 16px;
-  margin-left: 16px;
   padding: 12px 24px;
-  background-color: #0074d9;
+  background-color: #1027a8;
   color: white;
   border: none;
   border-radius: 8px;
+  width: 100%;
   cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.next-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-top: 16px;
+  padding: 12px 24px;
+  background-color: #1027a8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  width: 100%;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 
 .submit-button:hover {
@@ -349,13 +430,30 @@ h2, h3, h4, h5 {
 }
 
 .rating {
-  margin-top: 16px;
   font-size: 24px;
+  padding-block: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.average-rating{
+  margin-right: 16px;
+}
+
+.rating-sent{
+  transition: opacity 0.5s ease-in-out;
 }
 
 .star {
   cursor: pointer;
   color: #ccc;
+}
+
+.star:hover{
+  color: #ffcc00;
 }
 
 .star.active {

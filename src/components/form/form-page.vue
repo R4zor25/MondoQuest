@@ -1,7 +1,8 @@
 <template>
-    <Navbar @toggle-sidebar="toggleSidebar" />
+  <div class="frame">
+    <Navbar class="navbar" @toggle-sidebar="toggleSidebar" />
     <Sidebar :isSidebarVisible="isSidebarVisible" @toggle-sidebar="toggleSidebar" />
-  <div class="container mt-5">
+  <div class="container mt-5" >
   <form >
     <div class="container mt-5">
   <h1 class="mb-5">Kérdés létrehozó form</h1>
@@ -95,6 +96,7 @@
   </div>
   </form>
 </div>
+</div>
 </template>
 
 <script>
@@ -172,6 +174,29 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: #333;
+}
 
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #343a40;
+  overflow-x: hidden;
+  transition: transform 0.3s ease;
+  z-index: 1000; 
+}
+
+h1, h2, h3, h4, h5, h6, label {
+  color: #ccc;
+}
 </style>

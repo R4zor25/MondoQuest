@@ -1,17 +1,16 @@
 <template>
   <div>
-    <Navbar @toggle-sidebar="toggleSidebar" />
+    <Navbar class="navbar" @toggle-sidebar="toggleSidebar" />
     <Sidebar :isSidebarVisible="isSidebarVisible" @toggle-sidebar="toggleSidebar" />
-    <div class="container mt-3">
+    <div class="frame mt-3">
       <h1>Leaderboard</h1>
-      <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-3 main-content">
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-primary" :class="{ active: mode === 'infinite' }" @click="changeMode('infinite')">Infinite</button>
           <button type="button" class="btn btn-primary" :class="{ active: mode === 'story' }" @click="changeMode('story')">Story</button>
         </div>
-      </div>
       <transition name="fade" mode="out-in">
-        <table v-if="mode === 'infinite'" class="table table-bordered table-striped">
+        <table v-if="mode === 'infinite'" class="table table-hover table-bordered table-striped custom-table">
           <thead>
             <tr>
               <th scope="col">Rank</th>
@@ -48,6 +47,7 @@
           </tbody>
         </table>
       </transition>
+    </div>
     </div>
   </div>
 </template>
@@ -101,33 +101,87 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  margin-top: 20px;
+.frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  padding-top: 16px;
+  justify-content: center;
+  align-items: center;
+  background-color: #333;
+}
+
+.main-content{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #333;
+  align-items: center;
+  padding: 16px;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #343a40;
+  overflow-x: hidden;
+  transition: transform 0.3s ease;
+  z-index: 1000; 
+}
+h1, h2, h3, h4, h5, h6, li {
+  color: #ccc;
+  background: #333;
 }
 
 .table {
   margin-top: 20px;
+  width: 80%;
+  background: #333;
+  color: #ccc;
 }
+
+td:nth-child(even) {
+  background-color: #3a3a3a;
+  color: #ddd;
+}
+td:nth-child(odd) {
+  background-color: #6e6e6e;
+  color: #ddd;
+}
+
+th:nth-child(even) {
+  background-color: #3a3a3a;
+  color: #ddd;
+}
+th:nth-child(odd) {
+  background-color: #6e6e6e;
+  color: #ddd;
+}
+
 
 .btn-group .btn {
   border-radius: 0;
 }
 
 .btn-group .btn.active {
-  background-color: #0056b3;
-  border-color: #0056b3;
+  background-color: #1027a8;
+  border-color: #1027a8;
 }
 
 .thead-dark {
   background-color: #343a40;
-  color: #fff;
+  color: #555;
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s;
+  transition: all 0.5s ease;
 }
 
 .fade-enter-from, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
   opacity: 0;
+  transform: translateY(50px);
 }
 </style>

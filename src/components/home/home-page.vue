@@ -4,18 +4,21 @@
     <Sidebar :isSidebarVisible="isSidebarVisible" @toggle-sidebar="toggleSidebar" />
   <carousel class="carousel"  :items-to-show="imageCount" :wrapAround="true" :transition="500" :autoplay= 2000>
     <slide v-for="slide in this.imageList" :key="slide">
-      <img class="img-fluid img-thumbnail" :src="slide" alt="">
+      <img class="img-fluid img-thumbnail slide-image" :src="slide" alt="">
     </slide>
     <template #addons>
       <navigation />
       <pagination />
     </template>
   </carousel>
-  <h2>Általános információk</h2>
+  <h2>Általános tájékoztató (Érdemes elolvasni)</h2>
   <ul class="list-group list-group-flush">
     <li class="list-group-item">Tudnivaló 1</li>
     <li class="list-group-item">Tudnivaló 2</li>
     <li class="list-group-item">Tudnivaló 3</li>
+    <li class="list-group-item">Tudnivaló 4</li>
+    <li class="list-group-item">Tudnivaló 5</li>
+    <li class="list-group-item">Tudnivaló 6</li>
   </ul>
 </div>
 </template>
@@ -39,7 +42,7 @@ export default {
     return {
       isSidebarVisible: true,
       imageList: [
-        "https://picsum.photos/400/300",
+        "https://picsum.photos/1920/1080",
         "https://picsum.photos/400/301",
         "https://picsum.photos/400/302",
         "https://picsum.photos/400/303",
@@ -56,18 +59,20 @@ export default {
     toggleSidebar() {
       this.isSidebarVisible = !this.isSidebarVisible;
     },
-    isMobile() {
+    getImageCount() {
     if( screen.width <= 760 ) {
-                    return true;
+                    return 1;
                 }
-                else {
-                    return false;
+                else if (760 <= screen.width && screen.width < 2000) {
+                    return 3;
+                } else {
+                   return 6;
                 }
    },
   },
 
   mounted() {
-    if(this.isMobile()) this.imageCount = 1;
+    this.imageCount = this.getImageCount();
   },
 };
 </script>
@@ -78,6 +83,7 @@ export default {
   top: 0;
   left: 0;
   height: 100%;
+  width: 100%;
   justify-content: center;
   align-items: center;
   background-color: #333;
@@ -94,13 +100,20 @@ export default {
 }
 
 .carousel{
-  width: 90%;
+  width: 100%;
   margin-top: 30px;
   margin-left: auto;
   margin-right: auto;
 }
 
+.slide-image{
+  margin-left: 30px;
+  margin-right: 30px;
+  min-width: 15vh;
+}
+
 h1, h2, h3, h4, h5, h6, li {
   color: #ccc;
+  background: #333;
 }
 </style>
