@@ -7,7 +7,8 @@ import registerPage from '@/components/auth/register-page.vue'
 import leaderboardPage from '@/components/leaderboard/leaderboard-page.vue'
 import storyPage from '@/components/question/story-page.vue'
 import onboardingPage from '@/components/auth/onboarding-page.vue'
-import galleryPage from '@/components/gallery/user-image-gallery-page.vue'
+import galleryPage from '@/components/gallery/gallery-page.vue'
+import interactivePage from '@/components/interactive/interactive-page.vue'
 
 const routes = [
     {
@@ -33,7 +34,9 @@ const routes = [
     {
         path: '/gallery', name: 'gallery', component: galleryPage
     },
-
+    {
+        path: '/interactive', name: 'interactive', component: interactivePage
+    },
 
     {
         path: '/onboarding', name: 'onboarding', component: onboardingPage

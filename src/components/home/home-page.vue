@@ -11,14 +11,30 @@
       <pagination />
     </template>
   </carousel>
-  <h2>Általános tájékoztató (Érdemes elolvasni)</h2>
+  <h2>Általános tájékoztató (Érdemes elolvasni vagy nem)</h2>
   <ul class="list-group list-group-flush">
-    <li class="list-group-item">Tudnivaló 1</li>
-    <li class="list-group-item">Tudnivaló 2</li>
-    <li class="list-group-item">Tudnivaló 3</li>
-    <li class="list-group-item">Tudnivaló 4</li>
-    <li class="list-group-item">Tudnivaló 5</li>
-    <li class="list-group-item">Tudnivaló 6</li>
+    <li class="list-group-item">Alapvetően két kategóriában lehet kérdéseket / feladatokat elvégezni story/végtelen mód</li>
+    <li class="list-group-item">Story mód esetén a tudnivalók:
+      <dt>
+        <li>100 kérdésből áll, minden 10. különleges kérdés / feladat</li>
+        <li>A kérdések különböző nehézségűek, amely jelzésre is kerül a kérdés feltételekor. Minél nehezebb annál több pontot ér, viszont rossz válasz esetén levonás van.</li>
+        <li>Különleges kérdések esetén szükség lehet képet feltölteni, mint válasz.</li>
+        <li>Ezeknek az értékelése kézzel történik, amit időnként mi teszünk meg. Ezek a képek felkerülnek a galériába is, ahol bármelyik regisztrált felhasználó megnézheti</li>
+        <li>Story mód esetén két dologból áll össze a végső pontszám: A kérdésekből kapott pontszám és az 1. és 100. kérdés teljesítése között eltelt idő.</li>
+        <li>Alapből a kérdések lehetnek egyszerű szövegesek, olyan amihez kép tartozik, olyan amihez hang illetve speciális. Kép esetén ha szükséges, akkor rányomva lehetőség van belenagyítani.</li>
+        <li>A kérdés megválaszolása után lehetőség van értékelni a kérdést, ami visszajelzés felénk és az összes többi játékos felé is.</li>
+      </dt>
+    </li>
+    <li class="list-group-item">Végtelen mód esetén tudnivalók:
+      <dt>
+        <li>A Story módhoz képest ritkábban vannak speciális feladatok.</li>
+        <li>A kérdéseket addig tartanak, amíg az összes általunk készített kérdésre nem adsz választ. (Egy kérdés csak egyszer jelenik meg :) )</li>
+        <li>A pontszám egyedül a megválaszolt kérdésekből jön, nincs idő faktor.</li>
+      </dt>
+    </li>
+    <li class="list-group-item">Mindkét kategóriából a legjobban teljesítő kap egy apró nyereményt, amennyiben igazolja, hogy tényleg ő az és vasárnap délután 15:00 körül megkeresi a change my mind-os srácokat.</li>
+    <h2>Ha hibába futsz, kérlek legyél türelmes az oldallal és viszont ha úgy nem oldódik meg azt kérlek jelezd nekünk.</h2>
+    <h1>Ha nem érdekel a leírás, akkor csak Have Fun és érezd jól magad.</h1>
   </ul>
 </div>
 </template>

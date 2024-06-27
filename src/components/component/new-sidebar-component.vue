@@ -30,6 +30,18 @@
         </router-link>
       </li>
       <li class="nav-item border-bottom pb-2">
+        <router-link class="nav-link d-flex align-items-center" to="/interactive" replace>
+          <i class="bi bi-trophy"></i>
+          <span class="flex-grow-1" style="color: #ddd;">Interaktív kiértékelés</span>
+        </router-link>
+      </li>
+      <li class="nav-item border-bottom pb-2">
+        <router-link class="nav-link d-flex align-items-center" to="/gallery" replace>
+          <i class="bi bi-trophy"></i>
+          <span class="flex-grow-1" style="color: #ddd;">Galléria</span>
+        </router-link>
+      </li>
+      <li class="nav-item border-bottom pb-2">
         <router-link class="nav-link d-flex align-items-center" to="/leaderboard" replace>
           <i class="bi bi-trophy"></i>
           <span class="flex-grow-1" style="color: #ddd;">Ranglista</span>

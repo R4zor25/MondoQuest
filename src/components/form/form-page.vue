@@ -56,7 +56,7 @@
       </select>
     </div>
 
-    <div class="mb-3" v-if="questionType === 'IMAGE'">
+    <div class="mb-3" v-if="questionType === 'IMAGE' || solutionType === 'image'">
       <label for="imageUpload" class="form-label">Kép hozzáadása</label>
       <input class="form-control-file" @change="handleFileUpload"  type="file" id="imageUpload" accept="image/*" required>
     </div>

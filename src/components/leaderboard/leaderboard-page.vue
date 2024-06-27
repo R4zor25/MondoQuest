@@ -6,16 +6,16 @@
       <h1>Leaderboard</h1>
       <div class="d-flex justify-content-between align-items-center mb-3 main-content">
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-primary" :class="{ active: mode === 'infinite' }" @click="changeMode('infinite')">Infinite</button>
+          <button type="button" class="btn btn-primary" :class="{ active: mode === 'infinite' }" @click="changeMode('infinite')">Végtelen</button>
           <button type="button" class="btn btn-primary" :class="{ active: mode === 'story' }" @click="changeMode('story')">Story</button>
         </div>
       <transition name="fade" mode="out-in">
         <table v-if="mode === 'infinite'" class="table table-hover table-bordered table-striped custom-table">
           <thead>
             <tr>
-              <th scope="col">Rank</th>
-              <th scope="col">Player Name</th>
-              <th scope="col">Score</th>
+              <th scope="col">Helyezés</th>
+              <th scope="col">Játékos neve</th>
+              <th scope="col">Pontszám</th>
             </tr>
           </thead>
           <tbody>
@@ -29,11 +29,11 @@
         <table v-else class="table table-bordered table-striped">
           <thead>
             <tr>
-              <th scope="col">Rank</th>
-              <th scope="col">Player Name</th>
-              <th scope="col">Score</th>
-              <th scope="col">Story Start</th>
-              <th scope="col">Story End</th>
+              <th scope="col">Helyezés</th>
+              <th scope="col">Játékos neve</th>
+              <th scope="col">Pontszám</th>
+              <th scope="col">Story kezdete</th>
+              <th scope="col">Story befejezése</th>
             </tr>
           </thead>
           <tbody>
@@ -41,8 +41,8 @@
               <td>{{ index + 1 }}</td>
               <td>{{ player.username }}</td>
               <td>{{ player.score }}</td>
-              <td>{{ player.storyStart }}</td>
-              <td>{{ player.storyEnd }}</td>
+              <td>{{ formatDate(player.startTime) }}</td>
+              <td>{{ formatDate(player.finishTime) }}</td>
             </tr>
           </tbody>
         </table>
@@ -92,6 +92,21 @@ export default {
     },
     toggleSidebar() {
       this.isSidebarVisible = !this.isSidebarVisible;
+    },
+    formatDate(dateString) {
+      if (dateString === null) {
+        return "Nincs";
+      }
+      const date = new Date(dateString);
+      
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+
+      return `${year}. ${month}. ${day}. ${hours}:${minutes}:${seconds}`;
     }
   },
   mounted() {

@@ -4,6 +4,7 @@ const QuestionDifficulty = {
     VIDEO: "VIDEO",
     AUDIO: "AUDIO",
     GIF: "GIF",
+    INTERACTIVE: "INTERACTIVE",
 
     toString(value) {
         switch (value) {
@@ -17,6 +18,8 @@ const QuestionDifficulty = {
             return "Hang";
           case this.GIF:
             return "GIF";
+          case this.INTERACTIVE:
+            return "Interaktív";
         }
       }
 };

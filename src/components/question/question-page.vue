@@ -5,17 +5,21 @@
   <div class="container">
     <Transition name="slide-fade">
       <div class="question-card" v-show="!loading">
+        <div class="point-difficulty-section">
         <h5>Jelenlegi pontszámod: {{ this.userPoint }}</h5>
+        <h5>Kérdés Nehézsége: {{ translateDifficulty(question.difficulty) }}</h5>
+      </div>
         <select class="form-select" @change="fetchQuestionById" id="dropdown1" v-model="selectedQuestionId">
           <option v-for="(value, key) in questionIds" :key="key" :value="value">
             {{ value }}
           </option>
         </select>
-        <img v-if="question.questionType == 'IMAGE'" :src="'data:image/'+ imageType+';base64,'+ question.file" alt="Question Image" class="question-image" @click="toggleFullscreen"/>
+        <img v-if="question.questionType == 'IMAGE' || question.questionType == 'INTERACTIVE'" :src="'data:image/'+ imageType+';base64,'+ question.file" alt="Question Image" class="question-image" @click="toggleFullscreen"/>
         <audio v-if="question.questionType == 'AUDIO'" :src="'data:audio/wav;base64,'+ question.file" controls></audio>
         <h2>{{ question.title }}</h2>
         <h4>{{ question.description }}</h4>
-        <div class="answer-row" v-for="(row, rowIndex) in chunkedAnswers" :key="rowIndex">
+        <div v-if="question.questionType !== 'INTERACTIVE'" class="select-answer-section">
+        <div class="answer-row"  v-for="(row, rowIndex) in chunkedAnswers" :key="rowIndex">
           <div v-for="(answer, index) in row" :key="index" class="answer-card-container">
             <div 
               class="answer-card" 
@@ -32,6 +36,12 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div v-if="question.questionType === 'INTERACTIVE'" class="interactive-answer-section">
+        <label for="imageUpload" class="form-label">Kép hozzáadása</label>
+        <input class="form-control-file" @change="handleFileUpload"  type="file" id="imageUpload" accept="image/*" required>
+      </div>
         <div class="submit-button-section">
         <Transition name="slide-fade">
         <button class="check-button" @click="submitAnswer" v-if="result === null" key="check">Ellenőrzés</button>
@@ -75,6 +85,8 @@ import axios from 'axios';
 import Navbar from '../component/navbar-component.vue';
 import Sidebar from '../component/new-sidebar-component.vue';
 import store from '@/store';
+import QuestionDifficulty from '../model/QuestionDifficulty';
+
 export default {
   components: {
     Navbar, Sidebar
@@ -95,7 +107,8 @@ export default {
       selectedQuestionId: null,
       loading: false,
       rating: 0,
-      isFullscreen: false
+      isFullscreen: false,
+      base64Image: '',
     };
   },
   computed: {
@@ -104,6 +117,19 @@ export default {
     }
   },
   methods: {
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.base64Image = e.target.result.split(',')[1];
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    translateDifficulty(value) {
+      return QuestionDifficulty.toString(value);
+    },
     toggleSidebar() {
       this.isSidebarVisible = !this.isSidebarVisible;
     },
@@ -170,10 +196,11 @@ export default {
       this.selectedAnswer = index;
     },
     submitAnswer() {
-      if (this.selectedAnswer === null) {
+      if ((this.selectedAnswer === null && this.question.questionType !== 'INTERACTIVE') || (this.base64Image === '' && this.question.questionType === 'INTERACTIVE')) {
         alert('Please select an answer.');
         return;
       }
+      if(this.question.questionType !== 'INTERACTIVE'){
       const payload = this.question.answers[this.selectedAnswer];
       axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/infinite/answer/${this.userId}`, payload)
         .then(response => {
@@ -185,6 +212,19 @@ export default {
         .catch(error => {
           console.error('Error submitting answer:', error);
         });
+      } else {
+        const payload = {
+          imageFile: this.base64Image
+        };
+        axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/infinite/answer/interactive/${this.userId}`, payload)
+        .then(response => {
+          this.resultSent = true;
+          this.result = response.data;
+        })
+        .catch(error => {
+          console.error('Error submitting answer:', error);
+        });
+      }
     },
     rateQuestion(star) {
       if(!this.ratingSent){
@@ -250,6 +290,13 @@ h2, h3, h4, h5 {
   align-items: center;
   padding: 16px;
 }
+
+.point-difficulty-section {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  }
 
 .question-card {
   width: 100%;

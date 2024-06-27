@@ -7,14 +7,14 @@
       <form @submit.prevent>
         <div class="input-group">
           <i class="bi bi-person-circle"></i>
-          <input type="text" placeholder="Username" v-model="username" required>
+          <input type="text" placeholder="Felhasználónév" v-model="username" required>
         </div>
         <div class="input-group">
           <i class="bi bi-lock"></i>
-          <input type="password" placeholder="Password" v-model="password" required>
+          <input type="password" placeholder="Jelszó" v-model="password" required>
         </div>
-        <button @click="loginUser" class="btn">Login</button>
-        <button @click="navigateToRegister" class="btn">Create Account</button>
+        <button @click="loginUser" class="btn">Bejelentkezés</button>
+        <button @click="navigateToRegister" class="btn">Regisztráció</button>
       </form>
     </div>
   </div>
