@@ -36,6 +36,16 @@
     methods: {
       ...mapActions(['register']),
       registerUser() {
+  // Trim the username and password to remove leading and trailing whitespace
+  const trimmedUsername = this.username.trim();
+  const trimmedPassword = this.password.trim();
+
+  // Check if either the username or password is empty after trimming
+  if (!trimmedUsername || !trimmedPassword) {
+    alert('Egyik mező sem lehet üres!');
+    return;
+  }
+
         this.register({ username: this.username, password: this.password })
           .then(() => {
             this.$router.replace('/login')

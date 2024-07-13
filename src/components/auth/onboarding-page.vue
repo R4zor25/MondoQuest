@@ -40,13 +40,26 @@ export default {
   padding: 20px; /* adj hozzá némi paddinget, hogy a tartalom ne tapadjon közvetlenül a szélekhez */
 }
 
-h1, h h4 {
+.frame::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-height: 100vh; /* minimum magasság a képernyő magassága */
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Sötétítő réteg */
+  z-index: 0;
+}
+
+h1, h4 {
   color: #fff;
-  text-shadow: #000 0px 0px 15px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.3); /* Áttetsző háttérszín a szöveg mögött */
   transition: text-shadow 0.3s ease-in-out;
   text-align: center;
   background: none;
   font-weight: 700;
+  z-index: 1;
 }
 
 .list-class{

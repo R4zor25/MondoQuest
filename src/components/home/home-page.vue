@@ -11,9 +11,9 @@
       <pagination />
     </template>
   </carousel>
-  <h2>Általános tájékoztató (Érdemes elolvasni vagy nem, majd eldöntöd)</h2>
   <ul class="list-group list-group-flush">
-    <h3>TLDR; Story és végtelen módban lehet kérdéseket megválaszolni, a legjobbak apró nyereményben részesülnek</h3>
+    <h2>Általános tájékoztató (Érdemes elolvasni vagy nem, majd eldöntöd)</h2>
+    <h3>TLDR; Story és végtelen módban lehet kérdéseket megválaszolni és feladatokat teljesíteni, a legjobbak apró nyereményben részesülnek</h3>
     <h1 class="green-book-item">KERESSÉTEK A ZÖLD FÜZETEKET!</h1>
     <li class="list-group-item">Alapvetően két kategóriában lehet kérdéseket / feladatokat elvégezni story/végtelen mód</li>
     <li class="list-group-item">Story mód esetén a tudnivalók:
@@ -124,6 +124,17 @@ export default {
   background-position: center;
 }
 
+.frame::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-height: 100vh; /* minimum magasság a képernyő magassága */
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Sötétítő réteg */
+  z-index: 0;
+}
+
 .navbar {
   position: fixed;
   top: 0;
@@ -149,10 +160,13 @@ export default {
 
 h1, h2, h3, h4, h5, h6, li {
   color: #fff;
-  text-shadow: #000 0px 0px 15px;
+  /*text-shadow: #000 0px 0px 15px;*/
   transition: text-shadow 0.3s ease-in-out;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.3); /* Áttetsző háttérszín a szöveg mögött */
   text-align: center;
   background: none;
+  z-index: 1;
 }
 
 .list-group-item {
@@ -162,6 +176,7 @@ h1, h2, h3, h4, h5, h6, li {
   text-align: center;
   background: none;
   font-weight: 700;
+  z-index: 1;
 }
 
 .green-book-item{
