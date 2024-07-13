@@ -64,7 +64,7 @@ export default {
   },
   data() {
     return {
-      isSidebarVisible: true,
+      isSidebarVisible: false,
       imageList: [],
       imageCount: 3,
       token: null

@@ -82,7 +82,7 @@ export default {
     return {
       players: [],
       mode: 'infinite',
-      isSidebarVisible: true,
+      isSidebarVisible: false,
       token: null
     };
   },

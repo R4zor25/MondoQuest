@@ -114,7 +114,7 @@ export default {
   },
     data(){
         return{
-          isSidebarVisible: true,
+          isSidebarVisible: false,
           difficulties: QuestionDifficulty,
           questionTypes: QuestionType,
             title: '',

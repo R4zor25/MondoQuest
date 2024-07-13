@@ -109,7 +109,7 @@ export default {
   },
   data() {
     return {
-      isSidebarVisible: true,
+      isSidebarVisible: false,
       userId: null,
       question: {},
       imageType: 'png',

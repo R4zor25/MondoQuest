@@ -42,7 +42,7 @@ export default {
       confirmMessage: '',
       confirmAction: null,
       confirmAnswerId: null,
-      isSidebarVisible: true,
+      isSidebarVisible: false,
       token: null
     };
   },

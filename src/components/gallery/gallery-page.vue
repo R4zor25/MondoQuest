@@ -57,7 +57,7 @@ export default {
       currentPage: 1,
       itemsPerPage: 10,
       hasMore: false,
-      isSidebarVisible: true,
+      isSidebarVisible: false,
       token: null
     };
   },

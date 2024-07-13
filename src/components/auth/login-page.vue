@@ -1,5 +1,6 @@
 <template>
   <div class="login-container">
+    <h1>MondoQuest Kvíz</h1>
     <h1> Bejelentkezés </h1>
     <img :src="MondoQuestImage" alt="MondoQuest Logo">
     <div class="login-box">

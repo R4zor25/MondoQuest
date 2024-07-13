@@ -1,5 +1,6 @@
 <template>
   <div class="register-container">
+    <h1>MondoQuest Kvíz</h1>
     <H1> Regisztráció </H1>
     <img :src="MondoQuestImage" alt="MondoQuest Logo">
     <div class="register-box">
@@ -48,7 +49,7 @@
 
         this.register({ username: this.username, password: this.password })
           .then(() => {
-            this.$router.replace('/login')
+            this.$router.replace('/')
           })
           .catch(error => {
             alert(this.username + ' ' + this.password);
