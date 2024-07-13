@@ -1,26 +1,27 @@
 <template>
+
   <div class="frame">
     <Navbar class="navbar" @toggle-sidebar="toggleSidebar" />
     <Sidebar :isSidebarVisible="isSidebarVisible" @toggle-sidebar="toggleSidebar" />
-  <div class="container mt-5" >
+  <div class="container" >
   <form >
-    <div class="container mt-5">
+    <div class="container">
   <h1 class="mb-5">Kérdés létrehozó form</h1>
 
   <form @submit.prevent="sendQuestion">
     <!-- Title Input -->
-    <div class="mb-3">
+    <div>
       <label for="title" class="form-label">Cím</label>
       <input type="text" class="form-control" id="title" placeholder="Adja meg a címet" v-model="title" required>
     </div>
 
     <!-- Description Input -->
-    <div class="mb-3">
+    <div>
       <label for="description" class="form-label">Leírás</label>
       <textarea class="form-control" id="description" rows="3" placeholder="Adja meg a kérdés leírását" v-model="description"></textarea>
     </div>
 
-    <div class="mb-3">
+    <div>
       <label for="dropdown1" class="form-label">Válasz fajtája</label>
       <select class="form-select" id="dropdown1" v-model="solutionType">
         <option selected value="choice">Négy válaszlehetőség</option>
@@ -58,7 +59,7 @@
 
     <div class="mb-3" v-if="questionType === 'IMAGE' || solutionType === 'image'">
       <label for="imageUpload" class="form-label">Kép hozzáadása</label>
-      <input class="form-control-file" @change="handleFileUpload"  type="file" id="imageUpload" accept="image/*" required>
+      <input class="form-control-file" @change="handleFileUpload"  type="file" id="imageUpload" accept="image/*" :required="questionType !== 'INTERACTIVE'">
     </div>
 
     <!-- GIF Upload -->
@@ -105,6 +106,7 @@ import QuestionDifficulty from '../model/QuestionDifficulty';
 import QuestionType from '../model/QuestionType';
 import Navbar from '../component/navbar-component.vue';
 import Sidebar from '../component/new-sidebar-component.vue';
+import store from '@/store';
 
 export default {
   components: {
@@ -131,6 +133,7 @@ export default {
             solutionType: 'choice',
             selectedFile: null,
             base64Image: '',
+            token: null
         }
     },
     methods:{
@@ -163,13 +166,20 @@ export default {
           questionType: this.questionType,
           file: this.base64Image
         };
-        axios.post('http://192.168.0.39:8081/api/question/create', payload).then(response => {
+        axios.post('http://192.168.0.39:8081/api/question/create', payload, {
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        }).then(response => {
           alert('Sikeres feltöltés', response.data);
         })
         .catch(error => {
-          alert(`Something went wrong ${error.toString()}`, );
+          alert(`Valami szar ${error.toString()}`, );
         });
       }
+    },
+    mounted() {
+      this.token = store.getters.getUser.token
     }
 }
 </script>
@@ -179,7 +189,7 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
+  min-height: 100vh; /* minimum magasság a képernyő magassága */
   width: 100%;
   justify-content: center;
   align-items: center;

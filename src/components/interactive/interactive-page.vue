@@ -29,6 +29,7 @@ import axios from 'axios';
 import ImageCard from './image-card.vue';
 import Navbar from "../component/navbar-component.vue";
 import Sidebar from "../component/new-sidebar-component.vue";
+import store from '@/store';
 
 export default {
   components: {
@@ -41,10 +42,12 @@ export default {
       confirmMessage: '',
       confirmAction: null,
       confirmAnswerId: null,
-      isSidebarVisible: true
+      isSidebarVisible: true,
+      token: null
     };
   },
   mounted() {
+    this.token = store.getters.getUser.token
     this.fetchImages();
   },
   methods: {
@@ -53,7 +56,11 @@ export default {
     },
     async fetchImages() {
       try {
-        const response = await axios.get('http://192.168.0.39:8081/api/question/interactive/pending');
+        const response = await axios.get('http://192.168.0.39:8081/api/question/interactive/pending',{
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        });
         this.images = response.data;
       } catch (error) {
         console.error('Error fetching images:', error);
@@ -87,16 +94,22 @@ export default {
     },
     async acceptImage(answerId) {
       try {
-        await axios.post(`http://192.168.0.39:8081/api/question/interactive/${answerId}/accept`);
-        console.log('Accepted image with ID:', answerId);
+        await axios.post(`http://192.168.0.39:8081/api/question/interactive/${answerId}/accept`, {}, {
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        });
       } catch (error) {
         console.error('Error accepting image:', error);
       }
     },
     async rejectImage(answerId) {
       try {
-        await axios.post(`http://192.168.0.39:8081/api/question/interactive/${answerId}/reject`);
-        console.log('Rejected image with ID:', answerId);
+        await axios.post(`http://192.168.0.39:8081/api/question/interactive/${answerId}/reject`, {}, {
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        });
       } catch (error) {
         console.error('Error rejecting image:', error);
       }
@@ -116,7 +129,7 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
+  min-height: 100vh; /* minimum magasság a képernyő magassága */
   width: 100%;
   padding-top: 16px;
   justify-content: center;
@@ -128,7 +141,7 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #343a40;
+  background: #333;
   overflow-x: hidden;
   transition: transform 0.3s ease;
   z-index: 1000; 

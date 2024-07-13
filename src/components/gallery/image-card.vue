@@ -3,11 +3,10 @@
     <div class="image-wrapper">
       <img :src="imageSrc" @click="showImage" />
     </div>
-    <h3>{{ image.title }}</h3>
+    <h4>{{ image.title }}</h4>
     <p>{{ image.description }}</p>
-    <p>Leírás: {{ image.description }}</p>
-        <p :class="imageAnswerStateClass" v-if="image.imageAnswerState">Állapot: {{ translateImageAnswerState(image.imageAnswerState) }}</p>
-        <p v-if="image.questionGroupType" >Mód: {{ translateQuestionGroupType(image.questionGroupType) }}</p>
+    <p :class="imageAnswerStateClass" v-if="image.imageAnswerState">Állapot: {{ translateImageAnswerState(image.imageAnswerState) }}</p>
+    <p v-if="image.questionGroupType">Mód: {{ translateQuestionGroupType(image.questionGroupType) }}</p>
     <div v-if="isModalVisible" class="image-modal-overlay" @click="hideImage">
       <div class="image-modal-content">
         <img :src="imageSrc" />
@@ -15,56 +14,52 @@
     </div>
   </div>
 </template>
-  
-  <script>
-  import ImageAnswerState from '../model/ImageAnswerState';
-  import QuestionGroupType from '../model/QuestionGroupType';
-  export default {
-    props: {
-      image: {
-        type: Object,
-        required: true,
-      },
+
+<script>
+import ImageAnswerState from '../model/ImageAnswerState';
+import QuestionGroupType from '../model/QuestionGroupType';
+
+export default {
+  props: {
+    image: {
+      type: Object,
+      required: true,
     },
-    data() {
-      return {
-        isModalVisible: false,
-      };
+  },
+  data() {
+    return {
+      isModalVisible: false,
+    };
+  },
+  computed: {
+    imageSrc() {
+      return `data:image/jpeg;base64,${this.image.imageFile}`;
     },
-    computed: {
-      imageSrc() {
-        return `data:image/jpeg;base64,${this.image.imageFile}`;
-      },
+  },
+  methods: {
+    translateImageAnswerState(state) {
+      return ImageAnswerState.toString(state);
     },
-    methods: {
-      translateImageAnswerState(state) {
-        return ImageAnswerState.toString(state);
-      },
-      translateQuestionGroupType(type) {
-        return QuestionGroupType.toString(type);
-      },
-      showImage() {
-        this.isModalVisible = true;
-      },
-      hideImage() {
-        this.isModalVisible = false;
-      },
-      emitAccept() {
-        this.$emit('accept', this.image.answerId);
-      },
-      emitReject() {
-        this.$emit('reject', this.image.answerId);
-      },
+    translateQuestionGroupType(type) {
+      return QuestionGroupType.toString(type);
     },
-  };
-  </script>
-  
+    showImage() {
+      this.isModalVisible = true;
+    },
+    hideImage() {
+      this.isModalVisible = false;
+    },
+  },
+};
+</script>
+
 <style scoped>
 .image-card {
-  border: 1px solid #ccc;
+  border-radius: 8px;
   padding: 10px;
   width: 400px;
   text-align: center;
+  background: #333;
 }
 
 .image-wrapper {
@@ -94,19 +89,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
 }
 
 .image-modal-content {
-  max-width: 90%;
-  max-height: 90%;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
 }
 
 .image-modal-content img {
-  width: 100%;
-  height: auto; /* Maintain aspect ratio */
+  max-width: 50%;
+  max-height: 50%;
+  object-fit: contain;
 }
 
-h3, p {
-  color: #ccc
+h4, p {
+  color: #ccc;
 }
 </style>

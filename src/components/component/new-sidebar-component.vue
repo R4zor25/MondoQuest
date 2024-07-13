@@ -11,16 +11,16 @@
           <span class="flex-grow-1" style="color: #ddd;">Kezdőlap</span>
         </router-link>
       </li>
-      <li class="nav-item border-bottom pb-2">
+      <li v-if="this.isAdmin"  class="nav-item border-bottom pb-2">
         <router-link class="nav-link d-flex align-items-center" to="/form" replace>
           <i class="bi bi-file-earmark-plus"></i>
           <span class="flex-grow-1" style="color: #ddd;">Kérdés létrehozása</span>
         </router-link>
       </li>
       <li class="nav-item border-bottom pb-2">
-        <router-link class="nav-link d-flex align-items-center" to="/question" replace>
+        <router-link class="nav-link d-flex align-items-center" to="/infinite" replace>
           <i class="bi bi-question-circle"></i>
-          <span class="flex-grow-1" style="color: #ddd;">Végtelen kérdések</span>
+          <span class="flex-grow-1" style="color: #ddd;">Végtelen mód</span>
         </router-link>
       </li>
       <li class="nav-item border-bottom pb-2">
@@ -29,7 +29,7 @@
           <span class="flex-grow-1" style="color: #ddd;">Story mód</span>
         </router-link>
       </li>
-      <li class="nav-item border-bottom pb-2">
+      <li v-if="this.isAdmin" class="nav-item border-bottom pb-2">
         <router-link class="nav-link d-flex align-items-center" to="/interactive" replace>
           <i class="bi bi-trophy"></i>
           <span class="flex-grow-1" style="color: #ddd;">Interaktív kiértékelés</span>
@@ -37,8 +37,8 @@
       </li>
       <li class="nav-item border-bottom pb-2">
         <router-link class="nav-link d-flex align-items-center" to="/gallery" replace>
-          <i class="bi bi-trophy"></i>
-          <span class="flex-grow-1" style="color: #ddd;">Galléria</span>
+          <i class="bi bi-images"></i>
+          <span class="flex-grow-1" style="color: #ddd;">Galéria</span>
         </router-link>
       </li>
       <li class="nav-item border-bottom pb-2">
@@ -64,6 +64,11 @@ import store from '@/store';
 
 export default {
   name: 'SidebarComponent',
+  data() {
+    return {
+      isAdmin: false
+    };
+  },
   props: {
     isSidebarVisible: {
       type: Boolean,
@@ -77,6 +82,9 @@ export default {
     clearUserData(){
       store.commit('logout');
     }
+  },
+  mounted() {
+    this.isAdmin = store.getters.getUser.user.role === 'ADMIN';
   }
 };
 </script>
@@ -88,7 +96,7 @@ export default {
   left: 0;
   height: 100%;
   width: 250px;
-  background-color: #343a40;
+  background-color: #333;
   overflow-x: hidden;
   transition: transform 0.3s ease;
   z-index: 1000; 

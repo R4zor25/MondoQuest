@@ -2,49 +2,65 @@
   <div class="frame">
     <Navbar class="navbar" @toggle-sidebar="toggleSidebar" />
     <Sidebar :isSidebarVisible="isSidebarVisible" @toggle-sidebar="toggleSidebar" />
-  <div class="container">
+  <div v-if="!storyFinished" class="container">
     <Transition name="slide-fade">
       <div class="question-card" v-show="!loading">
         <div class="point-difficulty-section">
-        <h5>Jelenlegi pontszámod: {{ this.userPoint }}</h5>
-        <h5>Kérdés Nehézsége: {{ translateDifficulty(question.difficulty) }}</h5>
+        <h5>Pontszám: {{ this.userPoint }}</h5>
+        <h5>Kérdésszám: {{question.currentQuestionNumber + 1}} / {{ question.totalNumberOfQuestions }}</h5>
+        <h5>Nehézség: {{ translateDifficulty(question.difficulty) }}</h5>
       </div>
-        <select class="form-select" @change="fetchQuestionById" id="dropdown1" v-model="selectedQuestionId">
+        <select v-if="this.isAdmin" class="form-select" @change="fetchQuestionById" id="dropdown1" v-model="selectedQuestionId">
           <option v-for="(value, key) in questionIds" :key="key" :value="value">
             {{ value }}
           </option>
         </select>
-        <img v-if="question.questionType == 'IMAGE' || question.questionType == 'INTERACTIVE'" :src="'data:image/'+ imageType+';base64,'+ question.file" alt="Question Image" class="question-image" @click="toggleFullscreen"/>
-        <audio v-if="question.questionType == 'AUDIO'" :src="'data:audio/wav;base64,'+ question.file" controls></audio>
+        <img v-if="question.questionType == 'IMAGE' || (question.questionType == 'INTERACTIVE' && question.file != '')" :src="'data:image/'+ imageType+';base64,'+ question.file" alt="Question Image" class="question-image" @click="toggleFullscreen"/>
+        <audio class="audio-container" v-if="question.questionType == 'AUDIO'" :src="'data:audio/wav;base64,'+ question.file" controls></audio>
         <h2>{{ question.title }}</h2>
         <h4>{{ question.description }}</h4>
         <div v-if="question.questionType !== 'INTERACTIVE'" class="select-answer-section">
-        <div class="answer-row"  v-for="(row, rowIndex) in chunkedAnswers" :key="rowIndex">
-          <div v-for="(answer, index) in row" :key="index" class="answer-card-container">
-            <div 
-              class="answer-card" 
-              :class="{ 
-                selected: selectedAnswer === (rowIndex * 2 + index) && resultSent !== true, 
-                correct: result === true && selectedAnswer === (rowIndex * 2 + index) || (result != null && result.answerText === answer.answerText),  
-                incorrect: result != null && result.isCorrect === false && selectedAnswer === (rowIndex * 2 + index) 
-              }"
-              @click="result === null && !resultSent && selectAnswer(rowIndex * 2 + index)"
-              @mouseover="result === null && (hoveredAnswer = rowIndex * 2 + index)"
-              @mouseleave="hoveredAnswer = null"
-            >
-              {{ answer.answerText }}
-            </div>
+          <div>
+    <div class="answer-row" v-for="(row, rowIndex) in chunkedAnswers" :key="rowIndex">
+      <div v-for="(answer, index) in row" :key="index" class="answer-card-container">
+        <div
+          class="answer-card"
+          :class="{
+            selected: selectedAnswer === (rowIndex * 2 + index) && resultSent !== true,
+            correct: result === true && selectedAnswer === (rowIndex * 2 + index) || (result != null && result.answerText === answer.answerText),
+            incorrect: result != null && result.isCorrect === false && selectedAnswer === (rowIndex * 2 + index)
+          }"
+          @click="result === null && !resultSent && selectAnswer(rowIndex * 2 + index)"
+          @mouseover="result === null && (hoveredAnswer = rowIndex * 2 + index)"
+          @mouseleave="hoveredAnswer = null"
+        >
+        <div class="answer-div">
+          <div>
+          {{ answer.answerText }}
+        </div>
+          <div v-if="answerStatistics.length > 0" class="answer-statistics">
+            {{ getAnswerPercentage(answer.answerText) }}%
           </div>
         </div>
+          <div
+            v-if="answerStatistics.length > 0"
+            class="answer-fill"
+            :style="{ width: getAnswerPercentage(answer.answerText) + '%' }"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
       </div>
 
       <div v-if="question.questionType === 'INTERACTIVE'" class="interactive-answer-section">
         <label for="imageUpload" class="form-label">Kép hozzáadása</label>
-        <input class="form-control-file" @change="handleFileUpload"  type="file" id="imageUpload" accept="image/*" required>
+        <input class="form-control" @change="handleFileUpload"  type="file" id="imageUpload" accept="image/*" required>
+        <img class="question-image" v-if=" question.questionType == 'INTERACTIVE' && base64Image" :src="'data:image/'+ imageType+';base64,'+ base64Image"/>
       </div>
         <div class="submit-button-section">
         <Transition name="slide-fade">
-        <button class="check-button" @click="submitAnswer" v-if="result === null" key="check">Ellenőrzés</button>
+        <button class="check-button" :disabled="isCheckButtonDisabled" @click="submitAnswer" v-if="result === null" key="check">Ellenőrzés</button>
         </Transition>
         <Transition  name="slide-fade">
         <button class="next-button" @click="fetchQuestion" v-if="result !== null" key="next">Következő</button>
@@ -76,6 +92,13 @@
           </div>
         </div>
     </Transition>
+  </div>
+  <div v-if="storyFinished" class="centered-container">
+    <div class="card">
+      <h2>Gratulálok, végére értél a végtelen módnak.</h2>
+      <p>Végső pontszámod: {{ this.userPoint }} (ez változhat még kis mértékben a kiértékelésktől függően)</p>
+      <p>Nézz vissza később, mert új kérdésekkel fogunk várni.</p>
+    </div>
   </div>
 </div>
 </template>
@@ -109,6 +132,11 @@ export default {
       rating: 0,
       isFullscreen: false,
       base64Image: '',
+      storyFinished: false,
+      answerStatistics: [],
+      token: null,
+      isCheckButtonDisabled: false,
+      isAdmin: false
     };
   },
   computed: {
@@ -138,15 +166,29 @@ export default {
     },
     fetchQuestion() {
     this.loading = true;
-    this.selectedAnswer = null;
+    setTimeout(() => {
+      axios.get(`http://192.168.0.39:8081/api/question/infinite/random/${this.userId}`, {
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        })
+        .then(response => {
+          this.selectedAnswer = null;
     this.hoveredAnswer = null;
     this.result = null;
     this.resultSent = false;
     this.ratingSent = false;
     this.rating = 0;
-    setTimeout(() => {
-      axios.get(`http://192.168.0.39:8081/api/question/infinite/random/${this.userId}`)
-        .then(response => {
+    this.answerStatistics = [];
+    this.isCheckButtonDisabled = false;
+    this.base64Image = '';
+          let temp = response.data
+          if(temp.id === 0 && temp.title === "" && temp.description === "" && temp.answers.length === 0){
+             store.state.user.user.finishedInfinite = true;
+             this.storyFinished = true;
+            return 
+          }
+
           this.question = response.data;
           if (this.question.questionType === "GIF") {
             this.imageType = 'gif'
@@ -158,14 +200,19 @@ export default {
         }, 300);
         })
         .catch(error => {
-          console.error('Error fetching question:', error);
+          error
+          alert("Hiba történt a következő kérdés lekérése során. Kérlek próbáld újra, ha nem megy úgy se, próbáld meg kicsit később, ha úgy se, akkor próbálj meg ki és bejelentkezni. Ha ezután se, akkor jelezd nálunk kérlek (elérhetőség a főoldalon).");
           this.loading = false;
         });
       }, 300);
      // Delay for animation
   },
     fetchAllQuestionId(){
-      axios.get('http://192.168.0.39:8081/api/question/all').
+      axios.get('http://192.168.0.39:8081/api/question/all', {
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        }).
         then(response => {
           this.questionIds = response.data;
         })
@@ -175,12 +222,18 @@ export default {
     },
     fetchQuestionById(){
       this.loading = true;
-      this.selectedAnswer = null;
-      this.hoveredAnswer = null;
-      this.result = null;
-      this.resultSent = false;
-      this.ratingSent = false;
-      axios.get(`http://192.168.0.39:8081/api/question/${this.selectedQuestionId}`).
+    this.selectedAnswer = null;
+    this.hoveredAnswer = null;
+    this.result = null;
+    this.resultSent = false;
+    this.ratingSent = false;
+    this.rating = 0;
+    this.answerStatistics = [];
+      axios.get(`http://192.168.0.39:8081/api/question/${this.selectedQuestionId}`, {
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        }).
         then(response => {
           this.question = response.data;
           setTimeout(() => {
@@ -196,41 +249,66 @@ export default {
       this.selectedAnswer = index;
     },
     submitAnswer() {
+      if(this.isCheckButtonDisabled) return
+      this.isCheckButtonDisabled = true;
       if ((this.selectedAnswer === null && this.question.questionType !== 'INTERACTIVE') || (this.base64Image === '' && this.question.questionType === 'INTERACTIVE')) {
         alert('Please select an answer.');
         return;
       }
+      
       if(this.question.questionType !== 'INTERACTIVE'){
       const payload = this.question.answers[this.selectedAnswer];
-      axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/infinite/answer/${this.userId}`, payload)
+      this.resultSent = true;
+      axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/infinite/answer/${this.userId}`, payload, {
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        })
         .then(response => {
-          this.resultSent = true;
           this.result = response.data;
           this.userPoint = response.data.userPoint;
-          store.state.user.user.points = response.data.userPoint;
+          store.state.user.user.infinitePoints = response.data.userPoint;
+          this.answerStatistics = response.data.statistics;
         })
         .catch(error => {
-          console.error('Error submitting answer:', error);
+          this.resultSent = false;
+          this.isCheckButtonDisabled = false;
+          error
+          alert("Hiba történt a válasz beküldése során. Kérlek próbáld újra, ha nem megy úgy se, próbáld meg kicsit később, ha úgy se, akkor próbálj meg ki és bejelentkezni. Ha ezután se, akkor jelezd nálunk kérlek (elérhetőség a főoldalon).");
         });
       } else {
         const payload = {
           imageFile: this.base64Image
         };
-        axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/infinite/answer/interactive/${this.userId}`, payload)
+        axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/infinite/answer/interactive/${this.userId}`, payload, {
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        })
         .then(response => {
-          this.resultSent = true;
           this.result = response.data;
+          this.answerStatistics = response.data.statistics;
         })
         .catch(error => {
-          console.error('Error submitting answer:', error);
+          this.isCheckButtonDisabled = false;
+          error
+          alert("Hiba történt a válasz beküldése során. Kérlek próbáld újra, ha nem megy úgy se, próbáld meg kicsit később, ha úgy se, akkor próbálj meg ki és bejelentkezni. Ha ezután se, akkor jelezd nálunk kérlek (elérhetőség a főoldalon).");
         });
       }
+    },
+    getAnswerPercentage(answerText) {
+      const stat = this.answerStatistics.find(stat => stat.answer === answerText);
+      return stat ? (stat.percentage * 100).toFixed(2) : 0;
     },
     rateQuestion(star) {
       if(!this.ratingSent){
       this.rating = star;
       this.ratingSent = true;
-      axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/rate/${this.userId}`,  { rating: parseInt(star)})
+      axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/rate/${this.userId}`,  { rating: parseInt(star)}, {
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        })
       .then().catch(error => {
         console.error('Error rating question:', error);
       })
@@ -246,19 +324,44 @@ export default {
         result.push(array.slice(i, i + chunkSize));
       }
       return result;
+    },
+    getUserProgress(){
+      const endpoint = `http://192.168.0.39:8081/api/user/${this.userId}/progress`
+
+      axios
+        .get(endpoint, {
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        })
+        .then((response) => {
+          this.userPoint = response.data.infinitePoints;
+          this.storyFinished = response.data.finishedInfinite;
+        })
+        .catch((error) => {
+          error
+          alert('Hiba történt a pontszám lekérése közben. Kérlek próbáld újra később.');
+        });
     }
   },
   mounted() {
+    this.token = store.getters.getUser.token
+    if(store.getters.getUser.user.finishedInfinite === true){
+      this.storyFinished = true
+    } else {
     this.fetchQuestion();
     this.fetchAllQuestionId();
-    this.userPoint = store.getters.getUser.user.points;
+    }
+    this.userPoint = store.getters.getUser.user.infinitePoints;
     this.userId = store.getters.getUser.user.userId;
+    this.getUserProgress();
+    this.isAdmin = store.getters.getUser.user.role === 'ADMIN';
   }
 };
 </script>
 
 <style scoped>
-h2, h3, h4, h5 {
+h2, h3, h4, h5, p {
   color: #ddd;
 }
 
@@ -266,18 +369,20 @@ h2, h3, h4, h5 {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
+  min-height: 100vh; /* minimum magasság a képernyő magassága */
   width: 100%;
   justify-content: center;
   align-items: center;
-  background-color: #333;
+  background-image: url('@/assets/peak.jpeg');
+  background-size: cover;
+  background-position: center;
 }
 
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #343a40;
+  background: #333;
   overflow-x: hidden;
   transition: transform 0.3s ease;
   z-index: 1000; 
@@ -286,7 +391,6 @@ h2, h3, h4, h5 {
 .container {
   display: flex;
   flex-direction: column;
-  background-color: #333;
   align-items: center;
   padding: 16px;
 }
@@ -300,10 +404,12 @@ h2, h3, h4, h5 {
 
 .question-card {
   width: 100%;
+  /*max-height: 100vh; /* Limits the card height to the viewport height */
   align-items: center;
   max-width: 100vh;
   background-color: #555;
   border-radius: 8px;
+  overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 16px;
   opacity: 1;
@@ -372,8 +478,11 @@ h2, h3, h4, h5 {
 }
 
 .question-image {
+  max-width: 100%;
+  max-height: 35vh; /* Ensures the image doesn't exceed half the viewport height */
   width: auto;
-  height: 35vh;
+  height: auto;
+  object-fit: contain; /* Adjusts the image to fit within the container */
   margin-bottom: 20px;
   border-radius: 8px;
   margin-bottom: 16px;
@@ -381,12 +490,15 @@ h2, h3, h4, h5 {
 }
 
 @media (max-width: 800px) { .question-image { 
+  max-width: 100%;
+  max-height: 45vh; /* Ensures the image doesn't exceed half the viewport height */
+  width: auto;
   height: auto;
-  width: 31vh;
-  max-height: 80vh;
+  object-fit: contain; /* Adjusts the image to fit within the container */
   margin-bottom: 20px;
   border-radius: 8px;
   margin-bottom: 16px;
+  cursor: pointer;
 }
 }
 
@@ -397,6 +509,7 @@ h2, h3, h4, h5 {
 
 .answer-card-container {
   width: 48%;
+  position: relative; /* Needed for the answer-fill positioning */
 }
 
 .answer-card {
@@ -407,6 +520,8 @@ h2, h3, h4, h5 {
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.5s;
+  position: relative; /* Needed for the answer-fill positioning */
+  overflow: hidden; /* Hide overflow to make the fill animation look cleaner */
 }
 
 .answer-card:hover {
@@ -430,6 +545,21 @@ h2, h3, h4, h5 {
 .submit-button-section{
   position: relative;
   margin-bottom: 75px;
+}
+
+.answer-statistics {
+  padding-top: 8px;
+  font-weight: bold;
+  color: white;
+}
+
+.answer-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2); /* Darker shade for the fill */
+  transition: width 0.5s ease-in-out; /* Animation for the fill */
 }
 
 .check-button {
@@ -551,5 +681,32 @@ h2, h3, h4, h5 {
   cursor: pointer;
   font-size: 24px;
   color: #fff;
+}
+
+.answer-div {
+  display: flex;
+  flex-direction: column;
+}
+
+.centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url('@/assets/peak.jpeg');
+  background-size: cover;
+  background-position: center;
+}
+
+.card {
+  background-color: #333;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.audio-container{
+  width: 100%;
 }
 </style>

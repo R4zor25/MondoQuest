@@ -1,15 +1,30 @@
 <template>
-  <div>
+  <div class="frame">
     <Navbar class="navbar" @toggle-sidebar="toggleSidebar" />
     <Sidebar :isSidebarVisible="isSidebarVisible" @toggle-sidebar="toggleSidebar" />
-    <div class="frame mt-3">
-      <h1>Leaderboard</h1>
-      <div class="d-flex justify-content-between align-items-center mb-3 main-content">
-        <div class="btn-group" role="group">
-          <button type="button" class="btn btn-primary" :class="{ active: mode === 'infinite' }" @click="changeMode('infinite')">Végtelen</button>
-          <button type="button" class="btn btn-primary" :class="{ active: mode === 'story' }" @click="changeMode('story')">Story</button>
-        </div>
-      <transition name="fade" mode="out-in">
+    <h1>Ranglista</h1>
+    <div class="btn-container">
+      <div class="btn-group" role="group">
+        <button
+          type="button"
+          class="btn mode-button"
+          :class="{ active: mode === 'infinite' }"
+          @click="changeMode('infinite')"
+        >
+          Végtelen
+        </button>
+        <button
+          type="button"
+          class="btn mode-button"
+          :class="{ active: mode === 'story' }"
+          @click="changeMode('story')"
+        >
+          Story
+        </button>
+      </div>
+    </div>
+    <transition name="fade" mode="out-in">
+      <div class="table-container">
         <table v-if="mode === 'infinite'" class="table table-hover table-bordered table-striped custom-table">
           <thead>
             <tr>
@@ -34,6 +49,7 @@
               <th scope="col">Pontszám</th>
               <th scope="col">Story kezdete</th>
               <th scope="col">Story befejezése</th>
+              <th scope="col">Teljesítés időtartama</th>
             </tr>
           </thead>
           <tbody>
@@ -43,22 +59,20 @@
               <td>{{ player.score }}</td>
               <td>{{ formatDate(player.startTime) }}</td>
               <td>{{ formatDate(player.finishTime) }}</td>
+              <td>{{ calculateTime(player.startTime, player.finishTime) }}</td>
             </tr>
           </tbody>
         </table>
-      </transition>
-    </div>
-    </div>
+      </div>
+    </transition>
   </div>
 </template>
-
-
-
 
 <script>
 import axios from 'axios';
 import Navbar from "../component/navbar-component.vue";
 import Sidebar from "../component/new-sidebar-component.vue";
+import store from '@/store';
 
 export default {
   components: {
@@ -68,7 +82,8 @@ export default {
     return {
       players: [],
       mode: 'infinite',
-      isSidebarVisible: true
+      isSidebarVisible: true,
+      token: null
     };
   },
   methods: {
@@ -78,17 +93,24 @@ export default {
         : 'http://192.168.0.39:8081/api/user/leaderboard/story';
 
       axios
-        .get(endpoint)
+        .get(endpoint, {
+          headers: {
+            'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
+          }
+        })
         .then((response) => {
           this.players = response.data;
         })
         .catch((error) => {
           console.error('Error fetching leaderboard:', error);
+          alert('Hiba a ranglista betöltése közben. Kérlek próbáld újra később.');
         });
     },
     changeMode(newMode) {
+      if(this.mode !== newMode){
       this.mode = newMode;
       this.fetchLeaderboard();
+      }
     },
     toggleSidebar() {
       this.isSidebarVisible = !this.isSidebarVisible;
@@ -107,9 +129,40 @@ export default {
       const seconds = String(date.getSeconds()).padStart(2, '0');
 
       return `${year}. ${month}. ${day}. ${hours}:${minutes}:${seconds}`;
-    }
+    },
+    calculateTime(startTime, finishTime) {
+  if (startTime === null || finishTime === null) {
+    return "Még nem végzett";
+  }
+  
+  const start = new Date(startTime);
+  const end = new Date(finishTime);
+  const diff = end - start;
+  
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  let result = "";
+  if (days > 0) {
+    result += `${days} nap `;
+  }
+  if (hours > 0) {
+    result += `${hours} óra `;
+  }
+  if (minutes > 0) {
+    result += `${minutes} perc `;
+  }
+  if (seconds > 0) {
+    result += `${seconds} másodperc`;
+  }
+
+  return result.trim();
+}
   },
   mounted() {
+    this.token = store.getters.getUser.token
     this.fetchLeaderboard();
   },
 };
@@ -120,40 +173,71 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
-  padding-top: 16px;
-  justify-content: center;
-  align-items: center;
-  background-color: #333;
-}
-
-.main-content{
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  background-color: #333;
-  align-items: center;
-  padding: 16px;
+  background-image: url('@/assets/peak.jpeg');
+    background-size: cover;
+    background-position: center;
 }
 
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #343a40;
   overflow-x: hidden;
   transition: transform 0.3s ease;
-  z-index: 1000; 
-}
-h1, h2, h3, h4, h5, h6, li {
-  color: #ccc;
   background: #333;
+  z-index: 1000;
+}
+
+h1 {
+  color: #fff;
+  text-align: center;
+  margin-top: 20px;
+  text-shadow: text-#000 0px 0px 15px;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.btn-group {
+  display: flex;
+  width: 100%;
+  padding: 0px 32px 0px 32px;
+}
+
+.mode-button {
+  flex: 1;
+  background-color: #333;
+  color: white;
+  border: 1px solid #ccc;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.mode-button:hover {
+  background-color: #555;
+}
+
+.mode-button.active {
+  background-color: #777;
+  color: #fff;
+}
+
+.table-container {
+  width: 100%;
+  padding: 32px;
+  overflow-x: auto;
 }
 
 .table {
   margin-top: 20px;
-  width: 80%;
+  width: 100%;
   background: #333;
   color: #ccc;
 }
@@ -162,6 +246,7 @@ td:nth-child(even) {
   background-color: #3a3a3a;
   color: #ddd;
 }
+
 td:nth-child(odd) {
   background-color: #6e6e6e;
   color: #ddd;
@@ -171,31 +256,17 @@ th:nth-child(even) {
   background-color: #3a3a3a;
   color: #ddd;
 }
+
 th:nth-child(odd) {
   background-color: #6e6e6e;
   color: #ddd;
-}
-
-
-.btn-group .btn {
-  border-radius: 0;
-}
-
-.btn-group .btn.active {
-  background-color: #1027a8;
-  border-color: #1027a8;
-}
-
-.thead-dark {
-  background-color: #343a40;
-  color: #555;
 }
 
 .fade-enter-active, .fade-leave-active {
   transition: all 0.5s ease;
 }
 
-.fade-enter-from, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+.fade-enter-from, .fade-leave-to {
   opacity: 0;
   transform: translateY(50px);
 }

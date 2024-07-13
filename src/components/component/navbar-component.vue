@@ -23,9 +23,8 @@ export default {
 .navbar {
   position: absolute; /* Ensures the Navbar does not affect the document flow */
   top: 0;
-
-  transition: transform 0.3s ease;
   background: #333;
+  transition: transform 0.3s ease;
   z-index: 500; /* Below Sidebar */
 }
 </style>

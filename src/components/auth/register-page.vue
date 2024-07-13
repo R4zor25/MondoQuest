@@ -1,5 +1,6 @@
 <template>
   <div class="register-container">
+    <H1> Regisztráció </H1>
     <img :src="MondoQuestImage" alt="MondoQuest Logo">
     <div class="register-box">
       <div class="register-icon">
@@ -13,7 +14,7 @@
           <i class="bi bi-lock"></i>
           <input type="password" placeholder="Jelszó" v-model="password" required>
         </div>
-        <button @click="register" class="btn">Fiók létrehozása</button>
+        <button @click="registerUser" class="btn">Fiók létrehozása</button>
         <button @click="navigateToLogin" class="btn">Bejelentkező képernyő</button>
       </form>
     </div>
@@ -22,14 +23,13 @@
   
   <script>
   import { mapActions } from 'vuex'
-  import MondoQuestImage from '@/assets/MondoQuest.png';
+  import MondoQuestImage from '@/assets/badge.png';
   
   export default {
     data() {
       return {
         username: '',
         password: '',
-        role: 'USER',
         MondoQuestImage: MondoQuestImage
       }
     },
@@ -41,8 +41,9 @@
             this.$router.replace('/login')
           })
           .catch(error => {
+            alert(this.username + ' ' + this.password);
             console.error('Error registering:', error)
-            alert('Registration failed')
+            alert(`Regisztrációs sikertelen : ${error.message}`)
           })
       },
       navigateToLogin() {
@@ -61,20 +62,20 @@
     align-items: center;
     position: relative;
     flex-direction: column;
-    height: 100vh;
-    background: #000;
+    background-image: url('@/assets/peak.jpeg');
+    background-size: cover;
+    background-position: center;
     font-family: Arial, sans-serif;
+    min-height: 100vh; /* minimum magasság a képernyő magassága */
     width: 100%;
-    height: 100%;
 }
 
 img {
   display: block;
   align-content: center;
   width: 50%;
-  max-width:400px;
+  max-width:380px;
   margin-bottom: 20px;
-  background-color: rgba(0, 0, 0, 0.6);
   width: auto;
   height: auto;
 }
@@ -136,6 +137,14 @@ img {
 
 .btn:hover {
     background: rgba(255, 255, 255, 0.3);
+}
+
+h1 {
+  color: #fff;
+  text-shadow: #000 0px 0px 15px;
+  transition: text-shadow 0.3s ease-in-out;
+  text-align: center;
+  background: none;
 }
   </style>
   

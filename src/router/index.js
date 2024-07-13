@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import store from '@/store'
 import homePage from '@/components/home/home-page.vue'
 import formPage from '@/components/form/form-page.vue'
 import questionPage from '@/components/question/question-page.vue'
@@ -17,10 +18,10 @@ const routes = [
     },
     {
         path: '/form', name: 'form', component: formPage,
-        meta: { transition: 'slide-left', requiresAuth: true },
+        meta: { transition: 'slide-left', requiresAuth: true, requiresAdmin: true },
     },
     {
-        path: '/question',  name: 'question', component: questionPage,
+        path: '/infinite',  name: 'infinite', component: questionPage,
         meta: { transition: 'slide-left', requiresAuth: true },
     },
     {
@@ -32,11 +33,15 @@ const routes = [
         meta: { transition: 'slide-left', requiresAuth: true },
     },
     {
-        path: '/gallery', name: 'gallery', component: galleryPage
+        path: '/gallery', name: 'gallery', component: galleryPage,
+        meta: { transition: 'slide-left', requiresAuth: true },
     },
     {
-        path: '/interactive', name: 'interactive', component: interactivePage
+        path: '/interactive', name: 'interactive', component: interactivePage,
+        meta: { transition: 'slide-left', requiresAuth: true, requiresAdmin: true },
     },
+
+    
 
     {
         path: '/onboarding', name: 'onboarding', component: onboardingPage
@@ -56,12 +61,24 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    const loggedIn = localStorage.getItem('user')
-    if (to.matched.some(record => record.meta.requiresAuth) && !loggedIn) {
-      next('/onboarding')
+    const loggedIn = localStorage.getItem('user');
+    const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+    const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
+  
+    if (requiresAuth && !loggedIn) {
+      next('/onboarding');
     } else {
-      next()
+      if (requiresAdmin) {
+        const user = store.getters.getUser;
+        if (user && user.user.role === 'ADMIN') {
+          next();
+        } else {
+          next({ name: 'home' });
+        }
+      } else {
+        next();
+      }
     }
-  })
+  });
 
 export default router

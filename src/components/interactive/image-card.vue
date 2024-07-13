@@ -31,7 +31,7 @@
     },
     computed: {
       imageSrc() {
-        return `data:image/jpeg;base64,${this.image.imageFile}`;
+        return `data:image/png;base64,${this.image.imageFile}`;
       },
     },
     methods: {

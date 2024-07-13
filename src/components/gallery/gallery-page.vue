@@ -1,30 +1,40 @@
 <template>
-    <div>
+  <div>
+    <div class="frame">
       <Navbar class="navbar" @toggle-sidebar="toggleSidebar" />
       <Sidebar :isSidebarVisible="isSidebarVisible" @toggle-sidebar="toggleSidebar" />
-  <div class="app">
-    <div class="toggle-buttons">
-      <button :class="{ active: viewMode === 'own' }" @click="setViewMode('own')">Saját válaszok</button>
-      <button :class="{ active: viewMode === 'all' }" @click="setViewMode('all')">Mindenki válasza</button>
-    </div>
-    <div class="grid">
-      <ImageCard
-        v-for="image in images"
-        :key="image.answerId"
-        :image="image"
-        @accept="confirmAccept"
-        @reject="confirmReject"
-      />
-    </div>
-
-    <div v-if="isConfirmVisible" class="modal-overlay" @click="hideConfirm">
-      <div class="modal-content" @click.stop>
-        <p>{{ confirmMessage }}</p>
-        <button @click="executeConfirmAction">Yes</button>
-        <button @click="hideConfirm">No</button>
+      <div class="btn-container">
+        <div class="btn-group" role="group">
+          <button
+            type="button"
+            class="btn mode-button"
+            :class="{ active: viewMode === 'own' }"
+            @click="changeMode('own')"
+          >
+            Saját képek
+          </button>
+          <button
+            type="button"
+            class="btn mode-button"
+            :class="{ active: viewMode === 'infinite' }"
+            @click="changeMode('infinite')"
+          >
+            Megosztott képek
+          </button>
+        </div>
+      </div>
+      <div class="grid">
+        <ImageCard
+          v-for="image in images"
+          :key="image.answerId"
+          :image="image"
+        />
+      </div>
+      <div class="pagination">
+        <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+        <button @click="nextPage" :disabled="!hasMore">Next</button>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -42,19 +52,19 @@ export default {
   data() {
     return {
       images: [],
-      viewMode: 'own', // 'own' or 'all'
+      viewMode: 'own', // 'own' or 'infinite'
       userId: null,
-      isConfirmVisible: false,
-      confirmMessage: '',
-      confirmAction: null,
-      confirmAnswerId: null,
+      currentPage: 1,
+      itemsPerPage: 10,
+      hasMore: false,
       isSidebarVisible: true,
+      token: null
     };
   },
   mounted() {
+    this.token = store.getters.getUser.token;
     this.userId = store.getters.getUser.user.userId;
     this.fetchImages();
-
   },
   methods: {
     toggleSidebar() {
@@ -68,67 +78,130 @@ export default {
         url = 'http://192.168.0.39:8081/api/question/interactive/accepted';
       }
       try {
-        const response = await axios.get(url);
-        this.images = response.data;
+        const response = await axios.get(url, {
+          headers: {
+            'Authorization': `Bearer ${this.token}`
+          },
+          params: {
+            page: this.currentPage - 1 
+          }
+        });
+        this.images = response.data.imageAnswers;
+        this.hasMore = response.data.hasMore;
       } catch (error) {
         console.error('Error fetching images:', error);
+        alert('Hiba történt a képek betöltésekor. Kérjük, próbálja újra később.');
       }
     },
-    setViewMode(mode) {
-      this.viewMode = mode;
-      this.fetchImages();
+    changeMode(mode) {
+      if (this.viewMode !== mode) {
+        this.viewMode = mode;
+        this.currentPage = 1; // Reset to first page
+        this.fetchImages();
+      }
     },
-  },
+    nextPage() {
+      if (this.hasMore) {
+        this.currentPage++;
+        this.fetchImages();
+        window.scrollTo({
+        top: 0,
+        behavior: 'smooth' // Az 'auto' érték is használható, ha azonnali görgetést szeretnénk
+      });
+      }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+        this.fetchImages();
+        window.scrollTo({
+        top: 0,
+        behavior: 'smooth' // Az 'auto' érték is használható, ha azonnali görgetést szeretnénk
+      });
+      }
+    }
+  }
 };
 </script>
 
-<style>
-.app {
+<style scoped>
+.frame {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
+  min-height: 100vh; /* minimum magasság a képernyő magassága */
   width: 100%;
   padding-top: 16px;
-  justify-content: center;
-  align-items: center;
-  background-color: #333;
+  background-image: url('@/assets/peak.jpeg');
+  background-size: cover;
+  background-position: center;
 }
 
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #343a40;
   overflow-x: hidden;
   transition: transform 0.3s ease;
+  background: #333;
   z-index: 1000; 
 }
 
-.toggle-buttons {
+.btn-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-.toggle-buttons button {
-  margin: 0 10px;
-  padding: 10px 20px;
-  cursor: pointer;
-  border: none;
-  background-color: #007bff;
+.btn-group {
+  display: flex;
+  width: 100%;
+  padding: 0px 32px 0px 32px;
+}
+
+.mode-button {
+  flex: 1;
+  background: #333;
   color: white;
-  border-radius: 5px;
+  border: 1px solid #ccc;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: 1.5rem;
+  text-align: center;
 }
 
-.toggle-buttons button.active {
-  background-color: #0056b3;
+.mode-button:hover {
+  background-color: #555;
+}
+
+.mode-button.active {
+  background-color: #777;
+  color: #fff;
 }
 
 .grid {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  margin: 0 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .modal-overlay {
