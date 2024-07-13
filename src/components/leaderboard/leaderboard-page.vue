@@ -89,8 +89,8 @@ export default {
   methods: {
     fetchLeaderboard() {
       const endpoint = this.mode === 'infinite'
-        ? 'http://192.168.0.39:8081/api/user/leaderboard/infinite'
-        : 'http://192.168.0.39:8081/api/user/leaderboard/story';
+        ? 'https://mondo-quest.fly.dev/api/user/leaderboard/infinite'
+        : 'https://mondo-quest.fly.dev/api/user/leaderboard/story';
 
       axios
         .get(endpoint, {
@@ -194,7 +194,7 @@ h1 {
   color: #fff;
   text-align: center;
   margin-top: 20px;
-  text-shadow: text-#000 0px 0px 15px;
+  text-shadow: #000 0px 0px 15px;
 }
 
 .btn-container {

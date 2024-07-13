@@ -1,7 +1,7 @@
 <template>
     <div class="frame">
         <h1>Előzetes tájékoztató</h1>
-        <h2>TLDR; Kvíz App, feleletválasztós kérdésekkel és egyéb feladatokkal</h2>
+        <h1>TLDR; Kvíz App, feleletválasztós kérdésekkel és egyéb feladatokkal</h1>
         <ul class="list-class">
             <li class="important-list-item">Az egésznek semmi köze a MondoCon szervezőihez, nem hivatalos, mi csináltuk külön, teljes mértékben a szórakoztatásért</li>
             <li class="green-book-item">KERESSÉTEK A ZÖLD FÜZETEKET!</li>

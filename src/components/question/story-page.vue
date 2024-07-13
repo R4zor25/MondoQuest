@@ -159,7 +159,7 @@ export default {
     fetchQuestion() {
     this.loading = true;
     setTimeout(() => {
-      axios.get(`http://192.168.0.39:8081/api/question/story/random/${this.userId}`, {
+      axios.get(`https://mondo-quest.fly.dev/api/question/story/random/${this.userId}`, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -211,7 +211,7 @@ export default {
       }
       if(this.question.questionType !== 'INTERACTIVE'){
       const payload = this.question.answers[this.selectedAnswer];
-      axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/story/answer/${this.userId}`, payload, {
+      axios.post(`https://mondo-quest.fly.dev/api/question/${this.question.id}/story/answer/${this.userId}`, payload, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -232,7 +232,7 @@ export default {
         const payload = {
           imageFile: this.base64Image
         };
-        axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/story/answer/interactive/${this.userId}`, payload, {
+        axios.post(`https://mondo-quest.fly.dev/api/question/${this.question.id}/story/answer/interactive/${this.userId}`, payload, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -256,7 +256,7 @@ export default {
       if(!this.ratingSent){
       this.rating = star;
       this.ratingSent = true;
-              axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/rate/${this.userId}`, { rating: parseInt(star) }, {
+              axios.post(`https://mondo-quest.fly.dev/api/question/${this.question.id}/rate/${this.userId}`, { rating: parseInt(star) }, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -278,7 +278,7 @@ export default {
       return result;
     },
     getUserProgress(){
-      const endpoint = `http://192.168.0.39:8081/api/user/${this.userId}/progress`
+      const endpoint = `https://mondo-quest.fly.dev/api/user/${this.userId}/progress`
 
       axios
         .get(endpoint, {

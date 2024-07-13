@@ -166,7 +166,7 @@ export default {
           questionType: this.questionType,
           file: this.base64Image
         };
-        axios.post('http://192.168.0.39:8081/api/question/create', payload, {
+        axios.post('https://mondo-quest.fly.dev/api/question/create', payload, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }

@@ -167,7 +167,7 @@ export default {
     fetchQuestion() {
     this.loading = true;
     setTimeout(() => {
-      axios.get(`http://192.168.0.39:8081/api/question/infinite/random/${this.userId}`, {
+      axios.get(`https://mondo-quest.fly.dev/api/question/infinite/random/${this.userId}`, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -208,7 +208,7 @@ export default {
      // Delay for animation
   },
     fetchAllQuestionId(){
-      axios.get('http://192.168.0.39:8081/api/question/all', {
+      axios.get('https://mondo-quest.fly.dev/api/question/all', {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -229,7 +229,7 @@ export default {
     this.ratingSent = false;
     this.rating = 0;
     this.answerStatistics = [];
-      axios.get(`http://192.168.0.39:8081/api/question/${this.selectedQuestionId}`, {
+      axios.get(`https://mondo-quest.fly.dev/api/question/${this.selectedQuestionId}`, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -259,7 +259,7 @@ export default {
       if(this.question.questionType !== 'INTERACTIVE'){
       const payload = this.question.answers[this.selectedAnswer];
       this.resultSent = true;
-      axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/infinite/answer/${this.userId}`, payload, {
+      axios.post(`https://mondo-quest.fly.dev/api/question/${this.question.id}/infinite/answer/${this.userId}`, payload, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -280,7 +280,7 @@ export default {
         const payload = {
           imageFile: this.base64Image
         };
-        axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/infinite/answer/interactive/${this.userId}`, payload, {
+        axios.post(`https://mondo-quest.fly.dev/api/question/${this.question.id}/infinite/answer/interactive/${this.userId}`, payload, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -304,7 +304,7 @@ export default {
       if(!this.ratingSent){
       this.rating = star;
       this.ratingSent = true;
-      axios.post(`http://192.168.0.39:8081/api/question/${this.question.id}/rate/${this.userId}`,  { rating: parseInt(star)}, {
+      axios.post(`https://mondo-quest.fly.dev/api/question/${this.question.id}/rate/${this.userId}`,  { rating: parseInt(star)}, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -326,7 +326,7 @@ export default {
       return result;
     },
     getUserProgress(){
-      const endpoint = `http://192.168.0.39:8081/api/user/${this.userId}/progress`
+      const endpoint = `https://mondo-quest.fly.dev/api/user/${this.userId}/progress`
 
       axios
         .get(endpoint, {

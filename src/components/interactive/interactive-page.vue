@@ -56,7 +56,7 @@ export default {
     },
     async fetchImages() {
       try {
-        const response = await axios.get('http://192.168.0.39:8081/api/question/interactive/pending',{
+        const response = await axios.get('https://mondo-quest.fly.dev/api/question/interactive/pending',{
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -94,7 +94,7 @@ export default {
     },
     async acceptImage(answerId) {
       try {
-        await axios.post(`http://192.168.0.39:8081/api/question/interactive/${answerId}/accept`, {}, {
+        await axios.post(`https://mondo-quest.fly.dev/api/question/interactive/${answerId}/accept`, {}, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -105,7 +105,7 @@ export default {
     },
     async rejectImage(answerId) {
       try {
-        await axios.post(`http://192.168.0.39:8081/api/question/interactive/${answerId}/reject`, {}, {
+        await axios.post(`https://mondo-quest.fly.dev/api/question/interactive/${answerId}/reject`, {}, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }

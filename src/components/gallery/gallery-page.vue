@@ -73,9 +73,9 @@ export default {
     async fetchImages() {
       let url = '';
       if (this.viewMode === 'own') {
-        url = `http://192.168.0.39:8081/api/question/interactive/${this.userId}`;
+        url = `https://mondo-quest.fly.dev/api/question/interactive/${this.userId}`;
       } else {
-        url = 'http://192.168.0.39:8081/api/question/interactive/accepted';
+        url = 'https://mondo-quest.fly.dev/api/question/interactive/accepted';
       }
       try {
         const response = await axios.get(url, {

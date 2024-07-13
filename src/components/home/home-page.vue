@@ -90,7 +90,7 @@ export default {
    },
    async fetchLatest10Images() {
     try {
-        const response = await axios.get('http://192.168.0.39:8081/api/question/interactive/latest',{
+        const response = await axios.get('https://mondo-quest.fly.dev/api/question/interactive/latest',{
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
