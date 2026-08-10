@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-import axios from 'axios'
+import http from '@/services/http'
 
 const store = createStore({
   state: {
@@ -17,14 +17,14 @@ const store = createStore({
   },
   actions: {
     login({ commit }, { username, password }) {
-      return axios.post('https://mondo-quest.fly.dev/api/user/auth/login', { username, password })
+      return http.post('/api/user/auth/login', { username, password })
         .then(({ data }) => {
           commit('setUser', data)
           return data
         })
     },
     register({ commit }, { username, password }) {
-      return axios.post('https://mondo-quest.fly.dev/api/user/auth/register', { username, password })
+      return http.post('/api/user/auth/register', { username, password })
         .then(({ data }) => {
           commit('setUser', data)
           return data

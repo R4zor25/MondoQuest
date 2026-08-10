@@ -51,7 +51,7 @@ import Sidebar from "../component/new-sidebar-component.vue";
 import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import store from "@/store";
-import axios from "axios";
+import http from "@/services/http";
 
 export default {
   components: {
@@ -90,7 +90,7 @@ export default {
    },
    async fetchLatest10Images() {
     try {
-        const response = await axios.get('https://mondo-quest.fly.dev/api/question/interactive/latest',{
+        const response = await http.get('/api/question/interactive/latest',{
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }

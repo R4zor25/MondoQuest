@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import http from '@/services/http';
 import QuestionDifficulty from '../model/QuestionDifficulty';
 import QuestionType from '../model/QuestionType';
 import Navbar from '../component/navbar-component.vue';
@@ -166,7 +166,7 @@ export default {
           questionType: this.questionType,
           file: this.base64Image
         };
-        axios.post('https://mondo-quest.fly.dev/api/question/create', payload, {
+        http.post('/api/question/create', payload, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }

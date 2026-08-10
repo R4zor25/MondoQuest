@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import http from '@/services/http';
 import ImageCard from './image-card.vue';
 import Navbar from "../component/navbar-component.vue";
 import Sidebar from "../component/new-sidebar-component.vue";
@@ -56,7 +56,7 @@ export default {
     },
     async fetchImages() {
       try {
-        const response = await axios.get('https://mondo-quest.fly.dev/api/question/interactive/pending',{
+        const response = await http.get('/api/question/interactive/pending',{
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -94,7 +94,7 @@ export default {
     },
     async acceptImage(answerId) {
       try {
-        await axios.post(`https://mondo-quest.fly.dev/api/question/interactive/${answerId}/accept`, {}, {
+        await http.post(`/api/question/interactive/${answerId}/accept`, {}, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }
@@ -105,7 +105,7 @@ export default {
     },
     async rejectImage(answerId) {
       try {
-        await axios.post(`https://mondo-quest.fly.dev/api/question/interactive/${answerId}/reject`, {}, {
+        await http.post(`/api/question/interactive/${answerId}/reject`, {}, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent
           }

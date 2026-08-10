@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import http from '@/services/http';
 import Navbar from "../component/navbar-component.vue";
 import Sidebar from "../component/new-sidebar-component.vue";
 import store from '@/store';
@@ -89,10 +89,10 @@ export default {
   methods: {
     fetchLeaderboard() {
       const endpoint = this.mode === 'infinite'
-        ? 'https://mondo-quest.fly.dev/api/user/leaderboard/infinite'
-        : 'https://mondo-quest.fly.dev/api/user/leaderboard/story';
+        ? '/api/user/leaderboard/infinite'
+        : '/api/user/leaderboard/story';
 
-      axios
+      http
         .get(endpoint, {
           headers: {
             'Authorization': `Bearer ${this.token}` // Beállítjuk a header-t, hogy tartalmazza a JWT tokent

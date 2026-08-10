@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import http from '@/services/http';
 import store from '@/store';
 import ImageCard from './image-card.vue';
 import Navbar from "../component/navbar-component.vue";
@@ -73,12 +73,12 @@ export default {
     async fetchImages() {
       let url = '';
       if (this.viewMode === 'own') {
-        url = `https://mondo-quest.fly.dev/api/question/interactive/${this.userId}`;
+        url = `/api/question/interactive/${this.userId}`;
       } else {
-        url = 'https://mondo-quest.fly.dev/api/question/interactive/accepted';
+        url = '/api/question/interactive/accepted';
       }
       try {
-        const response = await axios.get(url, {
+        const response = await http.get(url, {
           headers: {
             'Authorization': `Bearer ${this.token}`
           },

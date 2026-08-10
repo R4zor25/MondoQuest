@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import store from '@/store'
 import homePage from '@/components/home/home-page.vue'
 import formPage from '@/components/form/form-page.vue'
@@ -56,7 +56,10 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(process.env.BASE_URL),
+    // Hash history avoids needing server-side rewrite rules, which GitHub
+    // Pages (a static host) doesn't support — deep links/refreshes on any
+    // route (e.g. /login) would otherwise 404.
+    history: createWebHashHistory(process.env.BASE_URL),
     routes
 })
 
